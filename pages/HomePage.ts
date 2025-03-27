@@ -38,6 +38,21 @@ export class HomePage {
     await this.page.goto('/index.html');
   }
 
+  async waitForAutoCompleateOptions(): Promise<void> {
+    await this.page.waitForSelector('[data-testid="autocomplete-results-options"]', {timeout: 2000});
+  }
+
+  async getAutocompleteOption(label: string): Promise<Locator> {
+    await this.waitForAutoCompleateOptions();
+    return this.page.locator('div[role="button"]').filter({ hasText: label }).first();
+  }
+
+  async waitForSearchResults(): Promise<void> {
+    this.logger.info('Waiting for navigation to search results page...');
+    await this.page.waitForURL(/searchresults/, { timeout: 10000 });
+    this.logger.success('Navigated to search results');
+  }
+
   async clickSearchButton() {
     const searchButton = await smartLocator(this.buttonSearchLocators);
     this.locatorValidator.ensureLocatorFound(searchButton, 'Search button');
@@ -48,19 +63,15 @@ export class HomePage {
     this.logger.info(`Searching for city: ${city}`);
 
     const input = await smartLocator(this.destinationLocators);
-
     this.locatorValidator.ensureLocatorFound(input, 'City input field');
     const resolvedInput = input!;
     await resolvedInput.click();
-    await this.page.keyboard.type(city, { delay: 100 });
-    await this.page.keyboard.press('ArrowDown');
-    await this.page.keyboard.press('Enter');  
-    
+    await this.page.keyboard.type(city, { delay: 80 });
+    this.logger.info('Waiting for auto complete dialog');
+    const cityOption = await this.getAutocompleteOption('New York');
+    await cityOption.click();
     await this.clickSearchButton();
-
-    this.logger.info('Waiting for navigation to search results page...');
-    await this.page.waitForURL(/searchresults/, { timeout: 10000 });
-    this.logger.success('Navigated to search results');
+    await this.waitForSearchResults();
   }
 
   async selectCheckInAndCheckOut(): Promise<void> {
