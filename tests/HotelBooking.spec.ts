@@ -1,4 +1,5 @@
 import { test } from '../fixtures/baseTest';
+import { isAscendingSorted } from '../utils/validators/SortValidator';
 import { expect } from '@playwright/test';
 
 const cityVariants = ['New York', 'new york', 'NEW YORK', '  New York', 'New York  '];
@@ -90,8 +91,7 @@ test(`Search results for: New York and sorting by lower price should show in cor
   await staysSearchResultsPage.sortByLabel('Price (lowest first)');
 
   const prices = await staysSearchResultsPage.getHotelPricesSortedList();
-  const isSorted = prices.every((val, i, arr) => i === 0 || arr[i - 1] <= val);
-  expect(isSorted).toBe(true);
+  expect(isAscendingSorted(prices)).toBe(true);
 
   logger.success('✅ Hotels are sorted by lowest price first');
 });
