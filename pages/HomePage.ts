@@ -1,18 +1,19 @@
+import { BasePage } from './BasePage';
 import { Page, type Locator} from '@playwright/test';
 import { smartLocator } from '../utils/LocatorUtils';
 import { Logger } from '../utils/logger';
 import { LocatorValidatorI } from '../utils/validators/LocatorValidatorInterface';
+import { getDateRangeFromToday } from '../utils/Generators';
 
-export class HomePage {
+export class HomePage extends BasePage {
 
   private readonly destinationLocators: Locator[];
   private readonly buttonSearchLocators: Locator[];
   private readonly checkInLocators: Locator[];
-  private readonly logger: Logger;
-  private readonly page: Page;
   private readonly locatorValidator: LocatorValidatorI;
 
   constructor(page: Page, logger: Logger, locatorValidator: LocatorValidatorI) {
+    super(page, logger);
     this.logger = logger;
     this.locatorValidator = locatorValidator;
     this.page = page;
@@ -38,6 +39,22 @@ export class HomePage {
     await this.page.goto('/index.html');
   }
 
+  async closeCalendarIfExists(): Promise<void> {
+    const calendar = this.page.locator('[data-testid="searchbox-datepicker"]');
+  
+    const isPresent = await calendar.count() > 0;
+    if (isPresent) {
+      this.logger.info('Calendar exists in DOM, attempting to close it...');
+      const toggle = this.page.locator('[data-testid="date-display-field-start"]');
+      await toggle.click();
+  
+      await calendar.waitFor({ state: 'detached', timeout: 5000 });
+      this.logger.success('Calendar removed from DOM successfully');
+    } else {
+      this.logger.info('Calendar not found in DOM — no action taken.');
+    }
+  }
+
   async waitForAutoCompleateOptions(): Promise<void> {
     await this.page.waitForSelector('[data-testid="autocomplete-results-options"]', {timeout: 2000});
   }
@@ -51,6 +68,7 @@ export class HomePage {
     this.logger.info('Waiting for navigation to search results page...');
     await this.page.waitForURL(/searchresults/, { timeout: 10000 });
     this.logger.success('Navigated to search results');
+    await this.closeSignInPopupIfPresent();
   }
 
   async clickSearchButton() {
@@ -76,6 +94,7 @@ export class HomePage {
 
   async selectCheckInAndCheckOut(): Promise<void> {
     this.logger.info('Selecting check-in and check-out dates');
+    const { startDate, endDate } = getDateRangeFromToday();
   
     const checkInLocator = await smartLocator(this.checkInLocators);
     this.locatorValidator.ensureLocatorFound(checkInLocator, 'Check-in trigger element');
@@ -84,19 +103,12 @@ export class HomePage {
     const calendarContainer = this.page.locator('[data-testid="searchbox-datepicker-calendar"]');
     await calendarContainer.waitFor({ state: 'visible', timeout: 5000 });
   
-    const checkInDate = this.page.locator('[data-date="2025-03-28"]');
-    const checkOutDate = this.page.locator('[data-date="2025-03-30"]');
+    const checkInDate = this.page.locator(`[data-date="${startDate}"]`);
+    const checkOutDate = this.page.locator(`[data-date="${endDate}"]`);
   
     await checkInDate.click();
     await checkOutDate.click();
 
     await this.clickSearchButton();
-
-  }
-  
-  async waitForResultsToRefresh(): Promise<void> {
-    this.logger.info('Waiting for results to refresh after selecting dates');
-    await this.page.waitForLoadState('networkidle');
-    await this.page.waitForTimeout(1000);
   }
 }
