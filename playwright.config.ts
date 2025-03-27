@@ -35,7 +35,7 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
-    headless: process.env.HEADLESS === 'true'?true:false,
+    headless: process.env.HEADLESS || true,
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
     baseURL: process.env.BASE_URL || 'https://www.booking.com',
