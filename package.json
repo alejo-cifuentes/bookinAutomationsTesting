@@ -1,0 +1,23 @@
+{
+  "name": "bookinautomationstesting",
+  "version": "1.0.0",
+  "description": "This repo is a test automation practice using Playwright",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "npm run build && npx playwright test",
+    "test:headed": "npm run build && npx playwright test --headed",
+    "test:ui": "npm run build && npx playwright test --ui"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.51.1",
+    "@types/node": "^22.13.14",
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7"
+  }
+}
