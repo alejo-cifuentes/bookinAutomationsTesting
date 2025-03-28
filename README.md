@@ -123,6 +123,25 @@ We invested heavily in:
 
 ---
 
+## 🔗 API Testing & UI Integration
+
+As part of our end-to-end validation strategy, the framework also includes **API testing** capabilities — especially for core flows like **flight search**.
+
+This allows us to:
+
+- Validate backend data integrity directly.
+- Detect mismatches between API responses and UI displays (e.g. total number of flights, available airlines, or pricing ranges).
+- Catch backend or integration issues early — before they affect real users.
+
+In future scenarios, we’ll also combine **API + UI validations** like:
+
+> 🔍 Making an API call to the flights endpoint and then asserting that the UI reflects the same results:  
+> total flights found, airlines listed, or cheapest flight options.
+
+This reinforces our **multi-layer validation philosophy**, ensuring both **visual accuracy** and **data correctness**.
+
+---
+
 ## 🧠 AI-Assisted Engineering
 
 This project benefited enormously from **Artificial Intelligence (ChatGPT)** in:

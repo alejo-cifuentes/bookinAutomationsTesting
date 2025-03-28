@@ -1,5 +1,6 @@
 import { test as base } from '@playwright/test';
 import { HomePage } from '../pages/HomePage';
+import { HotelDetailsPage } from '../pages/HotelDetailsPage';
 import { StaysSearchResultsPage } from '../pages/StaysSearchResultPage';
 import { ConsoleLogger, FileLogger, Logger } from '../utils/logger';
 import { DefaultLocatorValidator } from '../utils/validators/LocatorValidator';
@@ -17,6 +18,7 @@ type BookingTestFixtures = {
   logger: Logger;
   locatorValidator: typeof locatorValidator;
   pageValidator: typeof pageValidator;
+  createHotelDetailsPage: (newPage: any) => HotelDetailsPage;
 };
 
 export const test = base.extend<BookingTestFixtures>({
@@ -25,6 +27,9 @@ export const test = base.extend<BookingTestFixtures>({
   },
   staysSearchResultsPage: async ({ page }, use) => {
     await use(new StaysSearchResultsPage(page, logger, locatorValidator));
+  },
+  createHotelDetailsPage: async ({ logger }, use) => {
+    await use((newPage) => new HotelDetailsPage(newPage, logger));
   },
   logger: async ({}, use: any) => {
     await use(logger);
