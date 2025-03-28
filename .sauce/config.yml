@@ -1,0 +1,31 @@
+
+apiVersion: v1alpha
+kind: playwright
+sauce:
+  region: us-west-1
+  concurrency: 1
+  metadata:
+    tags:
+      - booking
+      - smoke
+    build: "booking-smoke-001"
+
+playwright:
+  version: 1.50.1
+  configFile: playwright.config.ts
+
+suites:
+  - name: "Booking Chromium Basic Run"
+    env:
+      BASE_URL: $BASE_URL
+      HEADLESS: $HEADLESS
+      PARALLEL: $PARALLEL
+      CI: $CI
+    platformName: "Windows 11"
+    screenResolution: "1920x1080"
+    testMatch:
+      - "tests/HotelBooking.spec.ts"
+    params:
+      browserName: "chromium"
+
+rootDir: ./

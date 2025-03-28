@@ -143,3 +143,4 @@ dist
 
 #mac
 .DS_Store
+/artifacts/
