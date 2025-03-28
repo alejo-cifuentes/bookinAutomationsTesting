@@ -96,4 +96,33 @@ test(`Search results for: New York and sorting by lower price should show in cor
   logger.success('✅ Hotels are sorted by lowest price first');
 });
 
+test(`Search results for: New York select the first hotel and it should have the basic information`, async ({
+  homePage,
+  staysSearchResultsPage,
+  context,
+  createHotelDetailsPage,
+  logger
+}) => {
+  await homePage.navigate();
+  await homePage.searchHotel('New York');
+  await homePage.selectCheckInAndCheckOut();
+  await homePage.waitForResultsToRefresh();
+  await homePage.closeCalendarIfExists();
+
+  const [newTab] = await Promise.all([
+    context.waitForEvent('page'),
+    staysSearchResultsPage.selectFirstHotel(),
+  ]);
+
+  await newTab.waitForLoadState('domcontentloaded');
+
+  const hotelDetailsPage = createHotelDetailsPage(newTab);
+
+  await hotelDetailsPage.waitForHotelDetails();
+  await hotelDetailsPage.validateHotelNameIsNotEmpty();
+
+  logger.success('✅ Hotels details contains the name');
+});
+
+
 
